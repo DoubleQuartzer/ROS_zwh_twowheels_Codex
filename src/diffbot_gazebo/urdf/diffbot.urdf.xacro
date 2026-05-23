@@ -9,6 +9,8 @@
   <xacro:property name="wheel_x" value="0.02"/>
   <xacro:property name="wheel_z" value="0.085"/>
   <xacro:property name="base_origin_z" value="${base_height / 2.0 + 0.035}"/>
+  <xacro:property name="support_ball_radius" value="0.022"/>
+  <xacro:property name="support_ball_z" value="${support_ball_radius - base_origin_z + 0.004}"/>
   <material name="body_blue"><color rgba="0.05 0.22 0.55 1"/></material>
   <material name="top_silver"><color rgba="0.75 0.8 0.86 1"/></material>
   <material name="wheel_black"><color rgba="0.02 0.02 0.025 1"/></material>
@@ -130,6 +132,32 @@
     <child link="right_wheel_link"/>
     <origin xyz="${wheel_x} ${-wheel_y} ${-base_height / 2.0 + wheel_z - 0.035}" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="front_visual_support_ball_link">
+    <visual>
+      <geometry><sphere radius="${support_ball_radius}"/></geometry>
+      <material name="rim_gray"/>
+    </visual>
+  </link>
+
+  <joint name="front_visual_support_ball_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_visual_support_ball_link"/>
+    <origin xyz="0.19 0 ${support_ball_z}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="rear_visual_support_ball_link">
+    <visual>
+      <geometry><sphere radius="${support_ball_radius}"/></geometry>
+      <material name="rim_gray"/>
+    </visual>
+  </link>
+
+  <joint name="rear_visual_support_ball_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_visual_support_ball_link"/>
+    <origin xyz="-0.19 0 ${support_ball_z}" rpy="0 0 0"/>
   </joint>
 
   <link name="sensor_mast_link">
