@@ -9,8 +9,6 @@
   <xacro:property name="wheel_x" value="0.02"/>
   <xacro:property name="wheel_z" value="0.085"/>
   <xacro:property name="caster_radius" value="0.035"/>
-  <xacro:property name="pi" value="3.141592653589793"/>
-
   <material name="body_blue"><color rgba="0.05 0.22 0.55 1"/></material>
   <material name="top_silver"><color rgba="0.75 0.8 0.86 1"/></material>
   <material name="wheel_black"><color rgba="0.02 0.02 0.025 1"/></material>
