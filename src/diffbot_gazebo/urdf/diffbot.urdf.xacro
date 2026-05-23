@@ -8,8 +8,8 @@
   <xacro:property name="wheel_y" value="0.205"/>
   <xacro:property name="wheel_x" value="0.02"/>
   <xacro:property name="wheel_z" value="0.085"/>
-  <xacro:property name="caster_radius" value="0.035"/>
-  <xacro:property name="caster_z" value="${-base_height / 2.0}"/>
+  <xacro:property name="caster_radius" value="0.025"/>
+  <xacro:property name="caster_z" value="${-base_height / 2.0 - 0.006}"/>
   <material name="body_blue"><color rgba="0.05 0.22 0.55 1"/></material>
   <material name="top_silver"><color rgba="0.75 0.8 0.86 1"/></material>
   <material name="wheel_black"><color rgba="0.02 0.02 0.025 1"/></material>
@@ -135,19 +135,22 @@
 
   <link name="front_caster_link">
     <inertial>
-      <mass value="0.12"/>
-      <inertia ixx="0.00015" ixy="0" ixz="0" iyy="0.00015" iyz="0" izz="0.00015"/>
+      <mass value="0.03"/>
+      <inertia ixx="0.00003" ixy="0" ixz="0" iyy="0.00003" iyz="0" izz="0.00003"/>
     </inertial>
     <collision>
       <geometry><sphere radius="${caster_radius}"/></geometry>
       <surface>
         <friction>
-          <ode><mu>0.01</mu><mu2>0.01</mu2></ode>
+          <ode><mu>0.001</mu><mu2>0.001</mu2></ode>
         </friction>
+        <contact>
+          <ode><kp>100000</kp><kd>1</kd><max_vel>0.2</max_vel><min_depth>0.001</min_depth></ode>
+        </contact>
       </surface>
     </collision>
     <visual>
-      <geometry><sphere radius="${caster_radius}"/></geometry>
+      <geometry><sphere radius="0.035"/></geometry>
       <material name="rim_gray"/>
     </visual>
   </link>
@@ -160,19 +163,22 @@
 
   <link name="rear_caster_link">
     <inertial>
-      <mass value="0.12"/>
-      <inertia ixx="0.00015" ixy="0" ixz="0" iyy="0.00015" iyz="0" izz="0.00015"/>
+      <mass value="0.03"/>
+      <inertia ixx="0.00003" ixy="0" ixz="0" iyy="0.00003" iyz="0" izz="0.00003"/>
     </inertial>
     <collision>
       <geometry><sphere radius="${caster_radius}"/></geometry>
       <surface>
         <friction>
-          <ode><mu>0.01</mu><mu2>0.01</mu2></ode>
+          <ode><mu>0.001</mu><mu2>0.001</mu2></ode>
         </friction>
+        <contact>
+          <ode><kp>100000</kp><kd>1</kd><max_vel>0.2</max_vel><min_depth>0.001</min_depth></ode>
+        </contact>
       </surface>
     </collision>
     <visual>
-      <geometry><sphere radius="${caster_radius}"/></geometry>
+      <geometry><sphere radius="0.035"/></geometry>
       <material name="rim_gray"/>
     </visual>
   </link>
