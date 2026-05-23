@@ -15,8 +15,8 @@ WASD keyboard control
 W/S   : forward / backward
 A/D   : turn left / turn right
 Space : stop
-Q/E   : increase / decrease linear speed
-Z/C   : increase / decrease angular speed
+Q/E   : linear speed faster / slower
+Z/C   : turn speed faster / slower
 Ctrl+C: quit
 """
 
@@ -30,6 +30,7 @@ class WasdTeleop(Node):
         self.settings = termios.tcgetattr(sys.stdin)
         self.get_logger().info('WASD teleop ready. Focus this terminal and press W/A/S/D.')
         print(HELP_TEXT)
+        self.print_status('ready')
 
     def read_key(self):
         tty.setraw(sys.stdin.fileno())
@@ -44,6 +45,12 @@ class WasdTeleop(Node):
         msg.angular.z = angular_z
         self.publisher.publish(msg)
 
+    def print_status(self, action, linear_x=0.0, angular_z=0.0):
+        self.get_logger().info(
+            f'{action}: cmd_linear={linear_x:.2f} m/s, cmd_angular={angular_z:.2f} rad/s, '
+            f'setting_linear={self.linear_speed:.2f} m/s, setting_angular={self.angular_speed:.2f} rad/s'
+        )
+
     def spin(self):
         try:
             while rclpy.ok():
@@ -51,26 +58,31 @@ class WasdTeleop(Node):
 
                 if key == 'w':
                     self.publish_twist(self.linear_speed, 0.0)
+                    self.print_status('forward', self.linear_speed, 0.0)
                 elif key == 's':
                     self.publish_twist(-self.linear_speed, 0.0)
+                    self.print_status('backward', -self.linear_speed, 0.0)
                 elif key == 'a':
                     self.publish_twist(0.0, self.angular_speed)
+                    self.print_status('turn left', 0.0, self.angular_speed)
                 elif key == 'd':
                     self.publish_twist(0.0, -self.angular_speed)
+                    self.print_status('turn right', 0.0, -self.angular_speed)
                 elif key == ' ':
                     self.publish_twist()
+                    self.print_status('stop')
                 elif key == 'q':
                     self.linear_speed *= 1.1
-                    self.get_logger().info(f'linear speed: {self.linear_speed:.2f} m/s')
+                    self.print_status('linear speed increased')
                 elif key == 'e':
                     self.linear_speed *= 0.9
-                    self.get_logger().info(f'linear speed: {self.linear_speed:.2f} m/s')
+                    self.print_status('linear speed decreased')
                 elif key == 'z':
                     self.angular_speed *= 1.1
-                    self.get_logger().info(f'angular speed: {self.angular_speed:.2f} rad/s')
+                    self.print_status('turn speed increased')
                 elif key == 'c':
                     self.angular_speed *= 0.9
-                    self.get_logger().info(f'angular speed: {self.angular_speed:.2f} rad/s')
+                    self.print_status('turn speed decreased')
                 elif key == '\x03':
                     break
         finally:

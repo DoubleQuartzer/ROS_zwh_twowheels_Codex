@@ -2,28 +2,23 @@
 
 这是一个 ROS2 + Gazebo Classic 双轮差速小车仿真包，适合课程设计、毕设和论文中的小车运动学解算验证。
 
+## 模型说明
+
+小车模型包含：
+
+- 双轮差速驱动轮
+- 前后两个球形支撑轮
+- 加高机体和顶部平台
+- 顶部圆柱形雷达外观件
+- 前部灯条、侧面装饰条和传感器支架
+
 ## 推荐环境
 
 - Ubuntu 22.04
 - ROS2 Humble
 - Gazebo Classic 11
 
-## Ubuntu 安装 Git
-
-```bash
-sudo apt update
-sudo apt install -y git
-git --version
-```
-
-第一次使用 Git 建议配置用户名和邮箱：
-
-```bash
-git config --global user.name "你的名字"
-git config --global user.email "你的邮箱"
-```
-
-## 安装 ROS2/Gazebo 依赖
+## 安装依赖
 
 ```bash
 sudo apt update
@@ -64,13 +59,43 @@ ros2 run diffbot_gazebo wasd_teleop.py
 
 常用按键：
 
-- `w` 前进
-- `s` 后退
-- `a` 左转
-- `d` 右转
-- `space` 停止
-- `q/e` 增大/减小线速度
-- `z/c` 增大/减小角速度
+```text
+W：前进
+S：后退
+A：左转
+D：右转
+空格：停止
+Q：线速度加快
+E：线速度减慢
+Z：转向角速度加快
+C：转向角速度减慢
+Ctrl+C：退出
+```
+
+控制节点每次按键都会打印当前信息：
+
+```text
+cmd_linear：本次发给小车的线速度，单位 m/s
+cmd_angular：本次发给小车的角速度，单位 rad/s
+setting_linear：当前线速度档位，按 Q/E 调整
+setting_angular：当前转向速度档位，按 Z/C 调整
+```
+
+速度调节规则：
+
+```text
+Q：当前线速度乘以 1.1，所以越来越快
+E：当前线速度乘以 0.9，所以越来越慢
+Z：当前转向角速度乘以 1.1，所以转弯越来越快
+C：当前转向角速度乘以 0.9，所以转弯越来越慢
+```
+
+初始速度：
+
+```text
+线速度 setting_linear = 0.25 m/s
+转向角速度 setting_angular = 0.90 rad/s
+```
 
 ## 运动解算节点
 
