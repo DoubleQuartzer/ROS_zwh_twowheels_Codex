@@ -27,7 +27,10 @@ class WasdTeleop(Node):
         self.publisher = self.create_publisher(Twist, 'cmd_vel', 10)
         self.linear_speed = 0.25
         self.angular_speed = 0.9
+        self.current_linear = 0.0
+        self.current_angular = 0.0
         self.settings = termios.tcgetattr(sys.stdin)
+        self.timer = self.create_timer(0.05, self.publish_current_twist)
         self.get_logger().info('WASD teleop ready. Focus this terminal and press W/A/S/D.')
         print(HELP_TEXT)
         self.print_status('ready')
@@ -45,6 +48,15 @@ class WasdTeleop(Node):
         msg.angular.z = angular_z
         self.publisher.publish(msg)
 
+    def publish_current_twist(self):
+        self.publish_twist(self.current_linear, self.current_angular)
+
+    def set_motion(self, action, linear_x=0.0, angular_z=0.0):
+        self.current_linear = linear_x
+        self.current_angular = angular_z
+        self.publish_current_twist()
+        self.print_status(action, linear_x, angular_z)
+
     def print_status(self, action, linear_x=0.0, angular_z=0.0):
         self.get_logger().info(
             f'{action}: cmd_linear={linear_x:.2f} m/s, cmd_angular={angular_z:.2f} rad/s, '
@@ -55,37 +67,35 @@ class WasdTeleop(Node):
         try:
             while rclpy.ok():
                 key = self.read_key()
+                rclpy.spin_once(self, timeout_sec=0.0)
 
                 if key == 'w':
-                    self.publish_twist(self.linear_speed, 0.0)
-                    self.print_status('forward', self.linear_speed, 0.0)
+                    self.set_motion('forward', self.linear_speed, 0.0)
                 elif key == 's':
-                    self.publish_twist(-self.linear_speed, 0.0)
-                    self.print_status('backward', -self.linear_speed, 0.0)
+                    self.set_motion('backward', -self.linear_speed, 0.0)
                 elif key == 'a':
-                    self.publish_twist(0.0, self.angular_speed)
-                    self.print_status('turn left', 0.0, self.angular_speed)
+                    self.set_motion('turn left', 0.0, self.angular_speed)
                 elif key == 'd':
-                    self.publish_twist(0.0, -self.angular_speed)
-                    self.print_status('turn right', 0.0, -self.angular_speed)
+                    self.set_motion('turn right', 0.0, -self.angular_speed)
                 elif key == ' ':
-                    self.publish_twist()
-                    self.print_status('stop')
+                    self.set_motion('stop')
                 elif key == 'q':
                     self.linear_speed *= 1.1
-                    self.print_status('linear speed increased')
+                    self.print_status('linear speed increased', self.current_linear, self.current_angular)
                 elif key == 'e':
                     self.linear_speed *= 0.9
-                    self.print_status('linear speed decreased')
+                    self.print_status('linear speed decreased', self.current_linear, self.current_angular)
                 elif key == 'z':
                     self.angular_speed *= 1.1
-                    self.print_status('turn speed increased')
+                    self.print_status('turn speed increased', self.current_linear, self.current_angular)
                 elif key == 'c':
                     self.angular_speed *= 0.9
-                    self.print_status('turn speed decreased')
+                    self.print_status('turn speed decreased', self.current_linear, self.current_angular)
                 elif key == '\x03':
                     break
         finally:
+            self.current_linear = 0.0
+            self.current_angular = 0.0
             self.publish_twist()
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
 
