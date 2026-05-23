@@ -1,0 +1,91 @@
+ROS2 双轮差速小车 Gazebo 仿真启动命令
+========================================
+
+适用环境：
+Ubuntu 22.04 + ROS2 Humble + Gazebo Classic
+
+
+一、每次开机后，先打开终端执行
+--------------------------------
+
+cd ~/ros2_diff_drive_ws
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+
+
+二、如果是第一次安装，或者 git pull 更新过代码，先重新编译
+--------------------------------------------------------
+
+cd ~/ros2_diff_drive_ws
+rm -rf build install log
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+
+
+三、启动 Gazebo 仿真
+-------------------
+
+cd ~/ros2_diff_drive_ws
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 launch diffbot_gazebo sim.launch.py
+
+
+四、另开一个新终端，启动 WASD 键盘控制
+-------------------------------------
+
+cd ~/ros2_diff_drive_ws
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 run diffbot_gazebo wasd_teleop.py
+
+
+五、键盘控制说明
+---------------
+
+W：前进
+S：后退
+A：左转
+D：右转
+空格：停止
+Q：线速度加快
+E：线速度减慢
+Z：转向角速度加快
+C：转向角速度减慢
+Ctrl+C：退出控制节点
+
+
+六、查看运动解算结果，可再开一个新终端
+-------------------------------------
+
+cd ~/ros2_diff_drive_ws
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 run diffbot_gazebo diff_drive_kinematics.py
+
+
+七、如果 Gazebo 还是显示旧模型，先关闭旧进程
+-------------------------------------------
+
+pkill -f gazebo
+pkill -f gzserver
+pkill -f gzclient
+
+然后重新执行第三步启动 Gazebo。
+
+
+八、如果终端提示旧工作空间 dev_ws 找不到
+---------------------------------------
+
+nano ~/.bashrc
+
+找到类似这一行：
+
+source ~/dev_ws/install/setup.bash
+
+在前面加 # 注释掉：
+
+# source ~/dev_ws/install/setup.bash
+
+保存退出后，重新打开终端。
