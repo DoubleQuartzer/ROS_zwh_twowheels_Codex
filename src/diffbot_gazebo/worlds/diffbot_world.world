@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="diffbot_world">
+    <plugin name="gazebo_ros_init" filename="libgazebo_ros_init.so"/>
+    <plugin name="gazebo_ros_factory" filename="libgazebo_ros_factory.so"/>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="motion_reference_grid">
+      <static>true</static>
+      <pose>0 0 0.006 0 0 0</pose>
+      <link name="grid_link">
+        <visual name="center_line_x">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box><size>8 0.03 0.01</size></box>
+          </geometry>
+          <material><ambient>0.05 0.25 0.95 1</ambient><diffuse>0.05 0.25 0.95 1</diffuse></material>
+        </visual>
+        <visual name="center_line_y">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box><size>0.03 8 0.01</size></box>
+          </geometry>
+          <material><ambient>0.95 0.18 0.12 1</ambient><diffuse>0.95 0.18 0.12 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="low_obstacle_demo">
+      <static>true</static>
+      <pose>2.0 1.2 0.08 0 0 0</pose>
+      <link name="box_link">
+        <collision name="collision">
+          <geometry><box><size>0.35 0.35 0.16</size></box></geometry>
+        </collision>
+        <visual name="visual">
+          <geometry><box><size>0.35 0.35 0.16</size></box></geometry>
+          <material><ambient>0.1 0.6 0.35 1</ambient><diffuse>0.1 0.6 0.35 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
