@@ -13,15 +13,20 @@ HELP_TEXT = """
 WASD keyboard control
 ---------------------
 W/S   : forward / backward
-A/D   : turn left / turn right
-W+A   : forward left curve
-W+D   : forward right curve
-S+A   : backward left curve
-S+D   : backward right curve
+A/D   : turn left / turn right, or add curve steering while driving straight
+W then A : forward left curve
+W then D : forward right curve
+S then A : backward left curve
+S then D : backward right curve
 Space : stop
 Q/E   : linear speed faster / slower
 Z/C   : turn speed faster / slower
 Ctrl+C: quit
+
+Command rule:
+W/S always interrupt the current motion and switch to straight driving.
+A/D add curve steering only when the robot is currently driving straight;
+otherwise A/D interrupt the current motion and switch to spin-in-place.
 """
 
 
@@ -100,6 +105,19 @@ class WasdTeleop(Node):
         self.angular_dir = 0
         self.update_motion_from_dirs('stop')
 
+    def set_straight_motion(self, linear_dir):
+        self.linear_dir = linear_dir
+        self.angular_dir = 0
+        self.update_motion_from_dirs(self.describe_motion())
+
+    def set_turn_motion(self, angular_dir):
+        if self.linear_dir != 0 and self.angular_dir == 0:
+            self.angular_dir = angular_dir
+        else:
+            self.linear_dir = 0
+            self.angular_dir = angular_dir
+        self.update_motion_from_dirs(self.describe_motion())
+
     def spin(self):
         try:
             while rclpy.ok():
@@ -107,17 +125,13 @@ class WasdTeleop(Node):
                 rclpy.spin_once(self, timeout_sec=0.0)
 
                 if key == 'w':
-                    self.linear_dir = 1
-                    self.update_motion_from_dirs(self.describe_motion())
+                    self.set_straight_motion(1)
                 elif key == 's':
-                    self.linear_dir = -1
-                    self.update_motion_from_dirs(self.describe_motion())
+                    self.set_straight_motion(-1)
                 elif key == 'a':
-                    self.angular_dir = 1
-                    self.update_motion_from_dirs(self.describe_motion())
+                    self.set_turn_motion(1)
                 elif key == 'd':
-                    self.angular_dir = -1
-                    self.update_motion_from_dirs(self.describe_motion())
+                    self.set_turn_motion(-1)
                 elif key == ' ':
                     self.stop_motion()
                 elif key == 'q':
